@@ -1,0 +1,368 @@
+import json, pathlib
+
+ROOT = pathlib.Path('/downloads/greedy-ladder')
+sync = json.loads((ROOT/'synced.json').read_text())
+
+LEVELS = [
+ ("LEVEL 1","warmup","learn to trust the greedy choice"),
+ ("LEVEL 2","sort + two pointers","greedy hides inside the sort"),
+ ("LEVEL 3","intervals","the classic greedy pattern"),
+ ("LEVEL 4","jump/reach","the second big pattern"),
+ ("LEVEL 5","strings and monotonic stacks",""),
+ ("LEVEL 6","heaps and scheduling","greedy + priority queue"),
+ ("LEVEL 7","boss level","proof-heavy"),
+]
+P = [
+ (1,"Assign Cookies",455,"assign-cookies","Easy"),
+ (1,"Lemonade Change",860,"lemonade-change","Easy"),
+ (1,"Array Partition",561,"array-partition","Easy"),
+ (1,"Maximum 69 Number",1323,"maximum-69-number","Easy"),
+ (1,"Largest Perimeter Triangle",976,"largest-perimeter-triangle","Easy"),
+ (1,"Maximum Units on a Truck",1710,"maximum-units-on-a-truck","Easy"),
+ (1,"Can Place Flowers",605,"can-place-flowers","Easy"),
+ (1,"DI String Match",942,"di-string-match","Easy"),
+ (1,"Min Cost to Move Chips to Same Position",1217,"minimum-cost-to-move-chips-to-the-same-position","Easy"),
+ (1,"Min Moves to Seat Everyone",2037,"minimum-number-of-moves-to-seat-everyone","Easy"),
+ (2,"Best Time to Buy and Sell Stock II",122,"best-time-to-buy-and-sell-stock-ii","Medium"),
+ (2,"Maximize Sum Of Array After K Negations",1005,"maximize-sum-of-array-after-k-negations","Easy"),
+ (2,"Maximum Number of Coins You Can Get",1561,"maximum-number-of-coins-you-can-get","Medium"),
+ (2,"Boats to Save People",881,"boats-to-save-people","Medium"),
+ (2,"Bag of Tokens",948,"bag-of-tokens","Medium"),
+ (2,"Largest Number",179,"largest-number","Medium"),
+ (2,"Container With Most Water",11,"container-with-most-water","Medium"),
+ (3,"Non-overlapping Intervals",435,"non-overlapping-intervals","Medium"),
+ (3,"Minimum Number of Arrows to Burst Balloons",452,"minimum-number-of-arrows-to-burst-balloons","Medium"),
+ (3,"Maximum Length of Pair Chain",646,"maximum-length-of-pair-chain","Medium"),
+ (3,"Partition Labels",763,"partition-labels","Medium"),
+ (3,"Two City Scheduling",1029,"two-city-scheduling","Medium"),
+ (3,"Queue Reconstruction by Height",406,"queue-reconstruction-by-height","Medium"),
+ (3,"Car Pooling",1094,"car-pooling","Medium"),
+ (3,"Remove Covered Intervals",1288,"remove-covered-intervals","Medium"),
+ (4,"Jump Game",55,"jump-game","Medium"),
+ (4,"Jump Game II",45,"jump-game-ii","Medium"),
+ (4,"Gas Station",134,"gas-station","Medium"),
+ (4,"Increasing Triplet Subsequence",334,"increasing-triplet-subsequence","Medium"),
+ (4,"Wiggle Subsequence",376,"wiggle-subsequence","Medium"),
+ (4,"Furthest Building You Can Reach",1642,"furthest-building-you-can-reach","Medium"),
+ (5,"Remove K Digits",402,"remove-k-digits","Medium"),
+ (5,"Remove Duplicate Letters",316,"remove-duplicate-letters","Medium"),
+ (5,"Valid Parenthesis String",678,"valid-parenthesis-string","Medium"),
+ (5,"String Without AAA or BBB",984,"string-without-aaa-or-bbb","Easy"),
+ (5,"Smallest String With A Given Numeric Value",1663,"smallest-string-with-a-given-numeric-value","Medium"),
+ (5,"Minimum Time to Make Rope Colorful",1578,"minimum-time-to-make-rope-colorful","Medium"),
+ (5,"Score After Flipping Matrix",861,"score-after-flipping-matrix","Medium"),
+ (5,"Broken Calculator",991,"broken-calculator","Medium"),
+ (6,"Task Scheduler",621,"task-scheduler","Medium"),
+ (6,"Reorganize String",767,"reorganize-string","Medium"),
+ (6,"Distant Barcodes",1054,"distant-barcodes","Medium"),
+ (6,"Min Deletions to Make Frequencies Unique",1647,"minimum-deletions-to-make-character-frequencies-unique","Medium"),
+ (6,"Split Array into Consecutive Subsequences",659,"split-array-into-consecutive-subsequences","Medium"),
+ (6,"Course Schedule III",630,"course-schedule-iii","Hard"),
+ (7,"Candy",135,"candy","Hard"),
+ (7,"IPO",502,"ipo","Hard"),
+ (7,"Minimum Number of Refueling Stops",871,"minimum-number-of-refueling-stops","Hard"),
+ (7,"Patching Array",330,"patching-array","Hard"),
+ (7,"Create Maximum Number",321,"create-maximum-number","Hard"),
+]
+assert len(P)==50
+problems = []
+for i,(lvl,title,num,slug,diff) in enumerate(P, start=1):
+    problems.append({"i":i,"level":lvl,"title":title,"num":num,"slug":slug,"diff":diff,
+        "lc": slug in sync["leetcode"], "user": slug in sync["user"]})
+DATA = {"levels":[{"k":k,"name":n,"sub":s} for k,n,s in LEVELS], "problems":problems,
+        "synced_at": sync["synced_at"], "profile": sync["profile"]}
+data_json = json.dumps(DATA, separators=(',',':'))
+slugs_json = json.dumps([p[3] for p in P])
+
+tpl = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Greedy Ladder - 50 LeetCode problems</title>
+<meta name="description" content="A 50-problem greedy algorithms ladder, easy to hard, synced with LeetCode progress.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0e11; --card:#17171c; --card2:#1d1d23; --line:#26262e; --ink:#f2f0ea; --dim:#9a97a3; --faint:#6d6b76;
+  --amber:#ffa116; --amber-dim:rgba(255,161,22,.14);
+  --blue:#7dd3fc; --blue-dim:rgba(125,211,252,.12);
+  --easy:#2cbb5d; --med:#ffc01e; --hard:#ff375f;
+  --rad:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.55 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:24px 18px 96px}
+.kicker{font:600 11px/1 'JetBrains Mono',monospace;letter-spacing:.18em;color:var(--amber);text-transform:uppercase}
+h1{font:700 clamp(30px,7vw,44px)/1.08 'Space Grotesk',sans-serif;letter-spacing:-.02em;margin:10px 0 8px}
+.sub{color:var(--dim);font-size:15px;max-width:48ch}
+.hero{margin-bottom:26px}
+.score{display:flex;align-items:baseline;gap:10px;margin:22px 0 10px}
+.score b{font:700 40px/1 'Space Grotesk',sans-serif;letter-spacing:-.02em}
+.score span{color:var(--dim);font-size:14px}
+.bar{height:8px;border-radius:99px;background:var(--card2);overflow:hidden}
+.bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#ff8a00,var(--amber));transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.rule{margin-top:20px;padding:14px 16px;border-left:3px solid var(--amber);background:var(--amber-dim);border-radius:0 var(--rad) var(--rad) 0;color:var(--ink);font-size:14px}
+.rule b{color:var(--amber)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;color:var(--faint);font-size:12.5px}
+.legend i{font-style:normal;display:inline-flex;align-items:center;gap:7px}
+.dot{width:9px;height:9px;border-radius:99px;display:inline-block}
+.dot.lc{background:var(--amber)} .dot.you{background:var(--blue)}
+.stick{position:sticky;top:0;z-index:20;background:rgba(14,14,17,.88);backdrop-filter:blur(10px);padding:12px 0 10px;margin:0 -2px;border-bottom:1px solid var(--line)}
+.controls{display:flex;gap:8px;align-items:center}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--dim);font:500 13px Inter;border-radius:99px;padding:8px 14px;cursor:pointer;min-height:36px}
+.chip.on{background:var(--ink);color:#111;border-color:var(--ink)}
+.search{flex:1;min-width:90px;background:var(--card);border:1px solid var(--line);border-radius:99px;color:var(--ink);font:400 14px Inter;padding:8px 14px;min-height:36px;outline:none}
+.search:focus{border-color:var(--amber)}
+.search::placeholder{color:var(--faint)}
+.miniprog{display:none;font:600 12px 'JetBrains Mono',monospace;color:var(--dim);margin-bottom:8px}
+.miniprog b{color:var(--amber)}
+.level{margin-top:30px}
+.lhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.lhead .lk{font:600 11px/1 'JetBrains Mono',monospace;letter-spacing:.18em;color:var(--faint)}
+.lhead h2{font:700 21px/1.15 'Space Grotesk',sans-serif;letter-spacing:-.01em;margin-top:6px}
+.lhead .lsub{color:var(--dim);font-size:13px;margin-top:3px}
+.lcount{font:600 13px 'JetBrains Mono',monospace;color:var(--dim);white-space:nowrap;text-align:right}
+.lcount.done{color:var(--amber)}
+.lbar{height:3px;border-radius:99px;background:var(--card2);margin-top:6px;min-width:64px;overflow:hidden}
+.lbar>i{display:block;height:100%;background:var(--amber);border-radius:99px;transition:width .4s}
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:2px;border-bottom:1px solid var(--line);min-height:56px;position:relative;cursor:pointer}
+.row:hover{background:rgba(255,255,255,.02)}
+.check{width:44px;height:100%;min-height:56px;display:grid;place-items:center;background:none;border:0;cursor:pointer;padding:0}
+.box{width:24px;height:24px;border-radius:8px;border:2px solid #3a3a44;display:grid;place-items:center;transition:all .18s}
+.box svg{width:14px;height:14px;opacity:0;transform:scale(.5);transition:all .18s}
+.row.done .box svg{opacity:1;transform:scale(1)}
+.row.done.lc .box{background:var(--amber);border-color:var(--amber)}
+.row.done.you .box{background:var(--blue);border-color:var(--blue)}
+.ptitle{font:500 15px/1.3 Inter;color:var(--ink);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding:10px 0}
+.ptitle .idx{font:600 12px 'JetBrains Mono',monospace;color:var(--faint)}
+.row.done .ptitle{color:var(--faint)}
+.row.done .ptitle .name{text-decoration:line-through;text-decoration-color:#4a4a55;text-decoration-thickness:1.5px}
+.pill{font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.06em;padding:3px 8px;border-radius:99px;margin-left:2px}
+.pill.Easy{color:var(--easy);background:rgba(44,187,93,.12)}
+.pill.Medium{color:var(--med);background:rgba(255,192,30,.1)}
+.pill.Hard{color:var(--hard);background:rgba(255,55,95,.1)}
+.src{font:600 9.5px 'JetBrains Mono',monospace;letter-spacing:.05em;padding:2px 6px;border-radius:99px}
+.src.lc{color:var(--amber);background:var(--amber-dim)}
+.src.you{color:var(--blue);background:var(--blue-dim)}
+.rside{display:flex;align-items:center;gap:2px}
+.iconbtn{width:38px;height:44px;display:grid;place-items:center;color:var(--faint);border:0;background:none;cursor:pointer;border-radius:8px}
+.iconbtn:hover{color:var(--ink)}
+.iconbtn svg{width:17px;height:17px}
+.note{display:none;padding:2px 0 12px 46px}
+.note.open{display:block}
+.note textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--ink);font:400 13.5px/1.5 Inter;padding:10px 12px;min-height:64px;resize:vertical;outline:none}
+.note textarea:focus{border-color:var(--amber)}
+.note textarea::placeholder{color:var(--faint)}
+.foot{margin-top:40px;color:var(--faint);font-size:12.5px;line-height:1.7;border-top:1px solid var(--line);padding-top:18px}
+.foot b{color:var(--dim);font-weight:600}
+#syncstate.live{color:var(--amber)}
+.reset{margin-top:12px;background:none;border:1px solid var(--line);color:var(--faint);font:500 12.5px Inter;border-radius:99px;padding:7px 14px;cursor:pointer;min-height:34px}
+.reset:hover{color:var(--ink);border-color:var(--faint)}
+.empty{display:none;text-align:center;color:var(--faint);padding:40px 0;font-size:14px}
+@media (max-width:420px){ .pill{font-size:9px;padding:2px 6px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">DSA practice · @__PROFILE__</div>
+    <h1>The Greedy Ladder</h1>
+    <p class="sub">50 LeetCode problems, easy to hard, grouped by pattern. Amber ticks are accepted on your LeetCode; blue ticks are marked by you.</p>
+    <div class="score"><b id="bigN">0</b><span>/ 50 done</span></div>
+    <div class="bar"><i id="bigBar"></i></div>
+    <div class="rule"><b>The rule:</b> before coding each one, write one line saying WHAT the greedy choice is ("always take the X with the most Y") and why a locally best pick can't hurt the global answer. That one line is the whole skill. Tap the <b>&#9998;</b> on a row to write yours.</div>
+    <div class="legend">
+      <i><span class="dot lc"></span> accepted on LeetCode</i>
+      <i><span class="dot you"></span> marked by you</i>
+    </div>
+  </header>
+  <div class="stick">
+    <div class="miniprog" id="mini"><b id="miniN">0</b>/50</div>
+    <div class="controls">
+      <button class="chip on" data-f="all">All</button>
+      <button class="chip" data-f="todo">To do</button>
+      <button class="chip" data-f="done">Done</button>
+      <input class="search" id="q" type="search" placeholder="Search # or name" aria-label="Search problems">
+    </div>
+  </div>
+  <main id="levels"></main>
+  <div class="empty" id="empty">Nothing matches. Clear the search or filter.</div>
+  <footer class="foot">
+    <div id="syncstate"><b>Source:</b> leetcode.com/u/<b>__PROFILE__</b> - <span id="syncnote">synced __SYNCED__</span></div>
+    <div style="margin-top:6px">Blue ticks and notes live only on this device. Amber ticks come from your LeetCode account.</div>
+    <button class="reset" id="reset">Reset my device ticks to synced state</button>
+  </footer>
+</div>
+<script>
+const DATA = __DATA__;
+const LS = 'greedy-ladder-v1', LSN = 'greedy-ladder-notes-v1';
+let lcSet = new Set(DATA.problems.filter(p=>p.lc).map(p=>p.slug));
+const userSet = new Set(DATA.problems.filter(p=>p.user).map(p=>p.slug));
+let over = {}, notes = {};
+try{ over = JSON.parse(localStorage.getItem(LS)||'{}'); notes = JSON.parse(localStorage.getItem(LSN)||'{}'); }catch(e){}
+const isDone = p => (p.slug in over) ? over[p.slug] : (lcSet.has(p.slug)||userSet.has(p.slug));
+const $ = s => document.querySelector(s);
+const main = $('#levels');
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+main.innerHTML = DATA.levels.map(L=>{
+  const ps = DATA.problems.filter(p=>p.level===+L.k.slice(-1));
+  return `<section class="level" data-level="${L.k}">
+    <div class="lhead">
+      <div><div class="lk">${L.k}</div><h2>${esc(L.name)}</h2>${L.sub?`<div class="lsub">${esc(L.sub)}</div>`:''}</div>
+      <div class="lcount" id="c${L.k.slice(-1)}"><span>0/${ps.length}</span><div class="lbar"><i style="width:0%"></i></div></div>
+    </div>
+    <div class="rows">` + ps.map(p=>`
+      <div class="row" data-slug="${p.slug}" data-title="${esc(p.title.toLowerCase())} ${p.num}">
+        <button class="check" aria-label="toggle done"><span class="box"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5 6.5 12 13 4.5" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+        <div class="ptitle"><span class="idx">${String(p.i).padStart(2,'0')}</span><span class="name">${esc(p.title)}</span>
+          <span class="pill ${p.diff}">${p.diff[0].toUpperCase()}</span>
+          <span class="badges"></span>
+        </div>
+        <div class="rside">
+          <button class="iconbtn notebtn" aria-label="greedy line note" title="Write your greedy line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+          <a class="iconbtn" href="https://leetcode.com/problems/${p.slug}/" target="_blank" rel="noopener" aria-label="open on LeetCode" title="Open on LeetCode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
+        </div>
+        <div class="note" style="grid-column:1/-1"><textarea placeholder="Greedy choice: always take the ... because ..." data-slug="${p.slug}"></textarea></div>
+      </div>`).join('') + `
+    </div>
+  </section>`;
+}).join('');
+
+function paint(){
+  let total=0;
+  DATA.levels.forEach(L=>{
+    const idx=+L.k.slice(-1);
+    const ps=DATA.problems.filter(p=>p.level===idx);
+    const d=ps.filter(isDone).length; total+=d;
+    const el=$('#c'+idx);
+    el.querySelector('span').textContent=`${d}/${ps.length}`;
+    el.querySelector('.lbar>i').style.width=(100*d/ps.length)+'%';
+    el.classList.toggle('done', d===ps.length);
+  });
+  $('#bigN').textContent=total; $('#miniN').textContent=total;
+  $('#bigBar').style.width=(total*2)+'%';
+  document.querySelectorAll('.row').forEach(r=>{
+    const p=DATA.problems.find(x=>x.slug===r.dataset.slug);
+    const done=isDone(p), lc=lcSet.has(p.slug);
+    r.classList.toggle('done', done);
+    r.classList.toggle('lc', done && lc);
+    r.classList.toggle('you', done && !lc);
+    r.querySelector('.badges').innerHTML =
+      (lc?'<span class="src lc" title="Accepted on LeetCode">LC &#10003;</span>':'') +
+      (done&&!lc?'<span class="src you" title="Marked by you">YOU</span>':'');
+  });
+}
+function applyFilter(){
+  const f=document.querySelector('.chip.on').dataset.f, q=$('#q').value.trim().toLowerCase();
+  let any=false;
+  document.querySelectorAll('.row').forEach(r=>{
+    const p=DATA.problems.find(x=>x.slug===r.dataset.slug);
+    const okF = f==='all' || (f==='done'&&isDone(p)) || (f==='todo'&&!isDone(p));
+    const okQ = !q || r.dataset.title.includes(q);
+    const show = okF&&okQ; r.style.display=show?'':'none'; any=any||show;
+  });
+  document.querySelectorAll('.level').forEach(s=>{
+    s.style.display=[...s.querySelectorAll('.row')].some(r=>r.style.display!=='none')?'':'none';
+  });
+  $('#empty').style.display=any?'none':'block';
+}
+main.addEventListener('click',e=>{
+  const row=e.target.closest('.row'); if(!row)return;
+  const slug=row.dataset.slug, p=DATA.problems.find(x=>x.slug===slug);
+  if(e.target.closest('a'))return;
+  if(e.target.closest('.notebtn')){
+    const n=row.querySelector('.note'); n.classList.toggle('open');
+    if(n.classList.contains('open'))n.querySelector('textarea').focus();
+    return;
+  }
+  if(e.target.closest('.note'))return;
+  over[slug]=!isDone(p); localStorage.setItem(LS,JSON.stringify(over)); paint(); applyFilter();
+});
+main.addEventListener('input',e=>{
+  if(e.target.matches('.note textarea')){ notes[e.target.dataset.slug]=e.target.value; localStorage.setItem(LSN,JSON.stringify(notes)); }
+});
+document.querySelectorAll('.note textarea').forEach(t=>{ if(notes[t.dataset.slug])t.value=notes[t.dataset.slug]; });
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); applyFilter();
+}));
+$('#q').addEventListener('input',applyFilter);
+$('#reset').addEventListener('click',()=>{ over={}; localStorage.removeItem(LS); paint(); applyFilter(); });
+const mini=$('#mini'), hero=document.querySelector('.hero');
+new IntersectionObserver(en=>{mini.style.display=en[0].isIntersecting?'none':'block';},{rootMargin:'-8px'}).observe(hero);
+paint(); applyFilter();
+
+/* Live sync: the site's own backend holds the LeetCode session server-side and
+   returns this account's solved list. On any failure the baked snapshot stays. */
+fetch('/api/progress').then(r=>{ if(!r.ok) throw 0; return r.json(); }).then(d=>{
+  if(!d || !Array.isArray(d.solved)) return;
+  lcSet = new Set(d.solved);
+  const el=$('#syncnote');
+  el.textContent='synced live just now';
+  $('#syncstate').classList.add('live');
+  paint(); applyFilter();
+}).catch(()=>{ const el=$('#syncnote'); if(el) el.textContent=el.textContent; });
+</script>
+</body>
+</html>'''
+
+out = tpl.replace('__DATA__', data_json).replace('__PROFILE__', sync['profile']).replace('__SYNCED__', sync['synced_at'])
+(ROOT/'index.html').write_text(out)
+
+api = r'''// Greedy Ladder progress sync. Runs server-side on Vercel; the LeetCode session
+// cookie lives only in Vercel env vars (LEETCODE_SESSION, LEETCODE_CSRF), never
+// in the frontend bundle. Returns only the caller's solved slugs for the 50
+// listed problems plus a timestamp.
+const SLUGS = new Set(__SLUGS__);
+const QUERY = `query userProgressQuestionList($filters: UserProgressQuestionListInput) {
+  userProgressQuestionList(filters: $filters) {
+    totalNum
+    questions { frontendQuestionId titleSlug questionStatus }
+  }
+}`;
+
+export default async function handler(req, res) {
+  const session = process.env.LEETCODE_SESSION;
+  const csrf = process.env.LEETCODE_CSRF;
+  if (!session || !csrf) return res.status(503).json({ error: 'sync_not_configured' });
+  try {
+    const solved = [];
+    let skip = 0, total = Infinity;
+    while (skip < total && skip < 2000) {
+      const r = await fetch('https://leetcode.com/graphql', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'cookie': 'LEETCODE_SESSION=' + session + '; csrftoken=' + csrf,
+          'x-csrftoken': csrf,
+          'referer': 'https://leetcode.com/progress/',
+          'origin': 'https://leetcode.com'
+        },
+        body: JSON.stringify({ query: QUERY, variables: { filters: { skip, limit: 100 } } })
+      });
+      if (!r.ok) return res.status(502).json({ error: 'leetcode_unavailable' });
+      const j = await r.json();
+      const d = j && j.data && j.data.userProgressQuestionList;
+      if (!d || !Array.isArray(d.questions)) return res.status(502).json({ error: 'leetcode_unexpected' });
+      total = d.totalNum;
+      for (const q of d.questions) {
+        if (q.questionStatus === 'SOLVED' && SLUGS.has(q.titleSlug)) solved.push(q.titleSlug);
+      }
+      if (d.questions.length === 0) break;
+      skip += d.questions.length;
+    }
+    res.setHeader('cache-control', 'private, max-age=300');
+    return res.status(200).json({ solved, syncedAt: new Date().toISOString() });
+  } catch (e) {
+    return res.status(502).json({ error: 'sync_failed' });
+  }
+}
+'''
+(ROOT/'api').mkdir(exist_ok=True)
+(ROOT/'api'/'progress.js').write_text(api.replace('__SLUGS__', slugs_json))
+print('site + api written;', len(problems), 'problems;', sum(1 for p in problems if p['lc']), 'lc;', sum(1 for p in problems if p['user'] and not p['lc']), 'user-only')
