@@ -1,6 +1,6 @@
 import json, pathlib
 
-ROOT = pathlib.Path('/downloads/greedy-ladder')
+ROOT = pathlib.Path(__file__).resolve().parent
 sync = json.loads((ROOT/'synced.json').read_text())
 
 LEVELS = [
@@ -169,6 +169,7 @@ h1{font:700 clamp(30px,7vw,44px)/1.08 'Space Grotesk',sans-serif;letter-spacing:
 </head>
 <body>
 <div class="wrap">
+  <nav aria-label="Practice tracks" style="display:flex;gap:8px;margin-bottom:24px"><a class="chip" href="index.html" aria-current="page" style="text-decoration:none;background:var(--ink);color:#111;border-color:var(--ink)">Greedy · 50</a><a class="chip" href="heap.html" style="text-decoration:none">Heap · 74</a></nav>
   <header class="hero">
     <div class="kicker">DSA practice · @__PROFILE__</div>
     <h1>The Greedy Ladder</h1>
@@ -259,7 +260,7 @@ function paint(){
   });
 }
 function applyFilter(){
-  const f=document.querySelector('.chip.on').dataset.f, q=$('#q').value.trim().toLowerCase();
+  const f=document.querySelector('[data-f].on').dataset.f, q=$('#q').value.trim().toLowerCase();
   let any=false;
   document.querySelectorAll('.row').forEach(r=>{
     const p=DATA.problems.find(x=>x.slug===r.dataset.slug);
@@ -288,8 +289,8 @@ main.addEventListener('input',e=>{
   if(e.target.matches('.note textarea')){ notes[e.target.dataset.slug]=e.target.value; localStorage.setItem(LSN,JSON.stringify(notes)); }
 });
 document.querySelectorAll('.note textarea').forEach(t=>{ if(notes[t.dataset.slug])t.value=notes[t.dataset.slug]; });
-document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
-  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); applyFilter();
+document.querySelectorAll('[data-f]').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('[data-f]').forEach(x=>x.classList.remove('on')); c.classList.add('on'); applyFilter();
 }));
 $('#q').addEventListener('input',applyFilter);
 $('#reset').addEventListener('click',()=>{ over={}; localStorage.removeItem(LS); paint(); applyFilter(); });

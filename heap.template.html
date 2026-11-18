@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Heap Ladder - patterns, practice and mastery</title>
+<meta name="description" content="A progressive heap and priority queue practice track: implementation, 12 patterns and checkpoints, and mixed interview practice.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0e11; --card:#17171c; --card2:#1d1d23; --line:#26262e; --ink:#f2f0ea; --dim:#9a97a3; --faint:#6d6b76;
+  --amber:#ffa116; --amber-dim:rgba(255,161,22,.14);
+  --blue:#7dd3fc; --blue-dim:rgba(125,211,252,.12);
+  --easy:#2cbb5d; --med:#ffc01e; --hard:#ff375f;
+  --rad:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.55 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:24px 18px 96px}
+.kicker{font:600 11px/1 'JetBrains Mono',monospace;letter-spacing:.18em;color:var(--amber);text-transform:uppercase}
+h1{font:700 clamp(30px,7vw,44px)/1.08 'Space Grotesk',sans-serif;letter-spacing:-.02em;margin:10px 0 8px}
+.sub{color:var(--dim);font-size:15px;max-width:48ch}
+.hero{margin-bottom:26px}
+.score{display:flex;align-items:baseline;gap:10px;margin:22px 0 10px}
+.score b{font:700 40px/1 'Space Grotesk',sans-serif;letter-spacing:-.02em}
+.score span{color:var(--dim);font-size:14px}
+.bar{height:8px;border-radius:99px;background:var(--card2);overflow:hidden}
+.bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#ff8a00,var(--amber));transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.rule{margin-top:20px;padding:14px 16px;border-left:3px solid var(--amber);background:var(--amber-dim);border-radius:0 var(--rad) var(--rad) 0;color:var(--ink);font-size:14px}
+.rule b{color:var(--amber)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;color:var(--faint);font-size:12.5px}
+.legend i{font-style:normal;display:inline-flex;align-items:center;gap:7px}
+.dot{width:9px;height:9px;border-radius:99px;display:inline-block}
+.dot.lc{background:var(--amber)} .dot.you{background:var(--blue)}
+.stick{position:sticky;top:0;z-index:20;background:rgba(14,14,17,.88);backdrop-filter:blur(10px);padding:12px 0 10px;margin:0 -2px;border-bottom:1px solid var(--line)}
+.controls{display:flex;gap:8px;align-items:center}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--dim);font:500 13px Inter;border-radius:99px;padding:8px 14px;cursor:pointer;min-height:36px}
+.chip.on{background:var(--ink);color:#111;border-color:var(--ink)}
+.search{flex:1;min-width:90px;background:var(--card);border:1px solid var(--line);border-radius:99px;color:var(--ink);font:400 14px Inter;padding:8px 14px;min-height:36px;outline:none}
+.search:focus{border-color:var(--amber)}
+.search::placeholder{color:var(--faint)}
+.miniprog{display:none;font:600 12px 'JetBrains Mono',monospace;color:var(--dim);margin-bottom:8px}
+.miniprog b{color:var(--amber)}
+.level{margin-top:30px}
+.lhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.lhead .lk{font:600 11px/1 'JetBrains Mono',monospace;letter-spacing:.18em;color:var(--faint)}
+.lhead h2{font:700 21px/1.15 'Space Grotesk',sans-serif;letter-spacing:-.01em;margin-top:6px}
+.lhead .lsub{color:var(--dim);font-size:13px;margin-top:3px}
+.lcount{font:600 13px 'JetBrains Mono',monospace;color:var(--dim);white-space:nowrap;text-align:right}
+.lcount.done{color:var(--amber)}
+.lbar{height:3px;border-radius:99px;background:var(--card2);margin-top:6px;min-width:64px;overflow:hidden}
+.lbar>i{display:block;height:100%;background:var(--amber);border-radius:99px;transition:width .4s}
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:2px;border-bottom:1px solid var(--line);min-height:56px;position:relative;cursor:pointer}
+.row:hover{background:rgba(255,255,255,.02)}
+.check{width:44px;height:100%;min-height:56px;display:grid;place-items:center;background:none;border:0;cursor:pointer;padding:0}
+.box{width:24px;height:24px;border-radius:8px;border:2px solid #3a3a44;display:grid;place-items:center;transition:all .18s}
+.box svg{width:14px;height:14px;opacity:0;transform:scale(.5);transition:all .18s}
+.row.done .box svg{opacity:1;transform:scale(1)}
+.row.done.lc .box{background:var(--amber);border-color:var(--amber)}
+.row.done.you .box{background:var(--blue);border-color:var(--blue)}
+.ptitle{font:500 15px/1.3 Inter;color:var(--ink);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding:10px 0}
+.ptitle .idx{font:600 12px 'JetBrains Mono',monospace;color:var(--faint)}
+.row.done .ptitle{color:var(--faint)}
+.row.done .ptitle .name{text-decoration:line-through;text-decoration-color:#4a4a55;text-decoration-thickness:1.5px}
+.pill{font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.06em;padding:3px 8px;border-radius:99px;margin-left:2px}
+.pill.Easy{color:var(--easy);background:rgba(44,187,93,.12)}
+.pill.Medium{color:var(--med);background:rgba(255,192,30,.1)}
+.pill.Hard{color:var(--hard);background:rgba(255,55,95,.1)}
+.src{font:600 9.5px 'JetBrains Mono',monospace;letter-spacing:.05em;padding:2px 6px;border-radius:99px}
+.src.lc{color:var(--amber);background:var(--amber-dim)}
+.src.you{color:var(--blue);background:var(--blue-dim)}
+.rside{display:flex;align-items:center;gap:2px}
+.iconbtn{width:38px;height:44px;display:grid;place-items:center;color:var(--faint);border:0;background:none;cursor:pointer;border-radius:8px}
+.iconbtn:hover{color:var(--ink)}
+.iconbtn svg{width:17px;height:17px}
+.note{display:none;padding:2px 0 12px 46px}
+.note.open{display:block}
+.note textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--ink);font:400 13.5px/1.5 Inter;padding:10px 12px;min-height:64px;resize:vertical;outline:none}
+.note textarea:focus{border-color:var(--amber)}
+.note textarea::placeholder{color:var(--faint)}
+.foot{margin-top:40px;color:var(--faint);font-size:12.5px;line-height:1.7;border-top:1px solid var(--line);padding-top:18px}
+.foot b{color:var(--dim);font-weight:600}
+#syncstate.live{color:var(--amber)}
+.reset{margin-top:12px;background:none;border:1px solid var(--line);color:var(--faint);font:500 12.5px Inter;border-radius:99px;padding:7px 14px;cursor:pointer;min-height:34px}
+.reset:hover{color:var(--ink);border-color:var(--faint)}
+.empty{display:none;text-align:center;color:var(--faint);padding:40px 0;font-size:14px}
+@media (max-width:420px){ .pill{font-size:9px;padding:2px 6px} }
+
+.tracknav{display:flex;gap:8px;margin-bottom:24px}.tracknav a{text-decoration:none;display:inline-flex;align-items:center;gap:8px}.tracknav [aria-current]{background:var(--ink);color:#111;border-color:var(--ink)}
+.controls{flex-wrap:wrap}.search{flex-basis:180px}.selects{display:flex;gap:8px;margin-top:8px}.selects select{min-width:0;flex:1;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font:400 13px Inter}
+summary{cursor:pointer;font-weight:600;color:var(--ink)}details p{margin-top:10px;color:var(--dim);font-size:13px}details{border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-top:12px;background:var(--card)}
+.checklist{display:grid;gap:12px;margin-top:14px}.checklist label{display:flex;gap:10px;align-items:flex-start;color:var(--dim);font-size:13px}.checklist input{margin-top:4px;accent-color:var(--amber);width:16px;height:16px;flex-shrink:0}
+.level{scroll-margin-top:150px}.lhead{align-items:flex-start}.lhead h2{font-size:20px}.row{grid-template-columns:40px minmax(0,1fr) auto;cursor:default}.ptitle{min-width:0}.ptitle .name{overflow-wrap:anywhere}.rside{gap:0}.iconbtn{width:32px}.note{padding-left:40px}.note textarea{display:block}.revisit{display:block;font-size:12px;color:var(--dim);margin-top:9px}.revisit input{accent-color:var(--blue);margin-right:6px}.countline{color:var(--dim);font:500 12px 'JetBrains Mono',monospace;margin-top:12px}.start{margin-top:14px;color:var(--amber);border-color:#684514}.resultcount{font-size:12px;color:var(--dim);margin-top:8px}.storage-warning{color:var(--hard);font-size:13px;margin-top:10px}.foot a{color:var(--dim)}button:focus-visible,a:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.pill{margin-left:0}.ptitle a{color:inherit;text-decoration:none}.ptitle a:hover{text-decoration:underline}.mastery{margin-top:36px}.mastery h2{font:700 24px 'Space Grotesk',sans-serif}.mastery>p{color:var(--dim);font-size:14px;margin-top:6px}.mastery small{color:var(--faint)}
+@media(max-width:420px){.wrap{padding-left:14px;padding-right:14px}.chip{padding:8px 12px}.search{flex-basis:100%;order:4}.selects select{font-size:12px;padding:9px 7px}.selects #pattern{flex:1.7}.level{scroll-margin-top:200px}.lhead h2{font-size:18px}.rside .iconbtn{width:29px}.ptitle{font-size:14px}.lcount{font-size:11px}.lbar{min-width:46px}.note{padding-left:6px}}
+</style></head><body><div class="wrap">
+<nav class="tracknav" aria-label="Practice tracks"><a class="chip" href="index.html">Greedy <small>50</small></a><a class="chip" href="heap.html" aria-current="page">Heap <small id="trackCount"></small></a></nav>
+<header class="hero"><div class="kicker">DSA practice · @Abydoesleet</div><h1>The Heap Ladder</h1>
+<p class="sub">From your first priority queue to mixed interview problems. Learn the invariant, practise the pattern, then solve it again without hints.</p>
+<div class="score"><b id="bigN">0</b><span id="totalLabel"></span></div><div class="bar" role="progressbar" aria-label="Heap problems completed" aria-valuemin="0" aria-valuenow="0"><i id="bigBar"></i></div>
+<div class="countline" id="reviewCount"></div>
+<div class="rule"><b>The rule:</b> before coding, name what the heap stores, what its root means, and why removing that root is safe. Record complexity and a counterexample to a tempting wrong approach in your notes.</div>
+<button class="chip start" id="next">Continue with first unfinished problem ↓</button>
+<details><summary>How to use this path</summary><p>Work through stages in order, and within a stage follow the listed order. Difficulty is LeetCode's label, not a prerequisite order. Read the study target and checkpoint for each stage. Hard extensions may take several sittings.</p><p>A solved tick means you completed the problem. Mark a blank-editor retry only after returning 2-3 days later without an editorial. Do not rush the last mixed stage. No fixed question count can guarantee proficiency.</p><p>Some problems also appear in Greedy: revisit them with a heap invariant. Some have a better non-heap solution: compare alternatives instead of forcing a priority queue. This path covers the main interview heap patterns, not every possible heap variant.</p></details>
+<details id="foundations"><summary>Before stage 1: implementation lab <span id="drillCount"></span></summary><p>These are coding drills, not additional LeetCode questions. Do them in your own editor and record what you learned in a problem note.</p><div class="checklist" id="drills"></div><p>Optional depth after the path: indexed heaps with a position map and decrease-key; d-ary heaps, meldable heaps, and why theoretical guarantees differ from library priority queues. You do not need Fibonacci heaps for this interview path.</p></details>
+<div class="storage-warning" id="storageWarning" role="status" hidden></div>
+</header>
+<div class="stick"><div class="controls" role="group" aria-label="Completion filter"><button class="chip on" data-f="all" aria-pressed="true">All</button><button class="chip" data-f="todo" aria-pressed="false">To do</button><button class="chip" data-f="done" aria-pressed="false">Done</button><input class="search" id="q" type="search" placeholder="Search number or name" aria-label="Search heap problems"></div>
+<div class="selects"><select id="pattern" aria-label="Filter by pattern"><option value="all">All patterns / stages</option></select><select id="difficulty" aria-label="Filter by difficulty"><option value="all">All difficulties</option><option>Easy</option><option>Medium</option><option>Hard</option></select></div><div class="resultcount" id="resultCount" aria-live="polite"></div></div>
+<main id="levels"></main><div class="empty" id="empty">Nothing matches. Clear your search or filters.</div>
+<section class="mastery"><h2>Ready without the labels?</h2><p>Use these as honest self-checks after the mixed stage. They are separate from completion counts.</p><div class="checklist" id="mastery"></div><p><small>Repeat missed patterns and revisit these checks. Finishing a list is practice, not a certification.</small></p></section>
+<footer class="foot"><div><b>Progress:</b> manual on this device only. Heap ticks, retries, drills and notes are separate from Greedy. This page does not fetch or claim live LeetCode progress.</div><div style="margin-top:8px">Problem IDs, titles, links and difficulties checked against <a href="https://github.com/doocs/leetcode" target="_blank" rel="noopener">Doocs' LeetCode index</a> on 18 Nov 2026. Pattern grouping and checkpoints are this track's learning plan. LeetCode may change access or labels.</div><button class="reset" id="backup">Download Heap progress backup</button> <button class="reset" id="restore">Restore Heap backup</button><input type="file" id="restoreFile" accept="application/json,.json" hidden><div id="backupStatus" role="status"></div></footer>
+</div><script>
+const DATA=__HEAP_DATA__;
+const KEY='heap-ladder-v1', $=s=>document.querySelector(s), esc=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;');
+const fresh=()=>({done:{},notes:{},review:{},drills:{},mastery:{}});
+function valid(s){return s&&typeof s==='object'&&!Array.isArray(s)&&['done','notes','review','drills','mastery'].every(k=>s[k]&&typeof s[k]==='object'&&!Array.isArray(s[k]))&&Object.values(s.notes).every(x=>typeof x==='string')&&['done','review','drills','mastery'].every(k=>Object.values(s[k]).every(x=>typeof x==='boolean'));}
+let state=fresh(),filter='all';
+try{const saved=localStorage.getItem(KEY);if(saved){const parsed=JSON.parse(saved);if(!valid(parsed))throw Error();state=parsed;}}catch(e){$('#storageWarning').hidden=false;$('#storageWarning').textContent='Saved Heap data could not be read. Export a backup before leaving; browser storage may be unavailable.';}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){$('#storageWarning').hidden=false;$('#storageWarning').textContent='Changes are only in this tab: browser storage is unavailable or full. Download a backup before leaving.';}}
+const drills=['Trace an array heap: parent floor((i-1)/2), children 2i+1 and 2i+2. Check the invariant by hand.', 'Implement push/pop/peek for a min-heap and max-heap; test against a sorted reference with random inputs.', 'Build a heap bottom-up, then implement in-place heapsort. Explain O(n) build and O(n log n) sort.', 'Write a comparator for (priority, index) with explicit ties; test large values without subtraction overflow.', 'Explain why arbitrary search/removal is O(n) in a plain binary heap; outline a position map for O(log n) updates.', 'Compare heap vs sorting, quickselect, balanced trees, buckets and monotonic deque. Give a case where each is better.'];
+const mastery=['I can implement and test a heap from a blank editor, and derive its operation costs.', 'I can choose min-heap vs max-heap and state an invariant before writing code.', 'I can handle ties, stale entries, duplicates, empty heaps and large sums correctly.', 'I can solve new mixed problems without being told the heap pattern, and explain when not to use a heap.', 'I have retried representative problems from every stage after a delay without an editorial.', 'I can justify correctness and time/space, including lazy-deletion memory growth and graph state dimensions.'];
+function checks(id,items,key){$(id).innerHTML=items.map((t,i)=>`<label><input type="checkbox" data-group="${key}" data-id="${i}" ${state[key][i]?'checked':''}><span>${esc(t)}</span></label>`).join('');}
+checks('#drills',drills,'drills');checks('#mastery',mastery,'mastery');
+$('#trackCount').textContent=DATA.problems.length;$('#totalLabel').textContent=`/ ${DATA.problems.length} done`;$('.bar').setAttribute('aria-valuemax',DATA.problems.length);
+$('#pattern').innerHTML+=DATA.levels.map(l=>`<option value="${l.id}">${l.id}. ${esc(l.name)}</option>`).join('');
+$('#levels').innerHTML=DATA.levels.map(l=>`<section class="level" data-level="${l.id}"><div class="lhead"><div><div class="lk">STAGE ${String(l.id).padStart(2,'0')}</div><h2>${esc(l.name)}</h2><p class="lsub">${esc(l.sub)}</p></div><div class="lcount" id="c${l.id}"><span></span><div class="lbar"><i></i></div></div></div><details><summary>Study target &amp; checkpoint</summary><p>${esc(l.study)}</p><p><b>Move on when:</b> ${esc(l.gate)}</p></details><div class="rows">${DATA.problems.filter(p=>p.level===l.id).map(p=>`<div class="row" data-slug="${p.slug}"><button class="check" aria-label="Mark ${esc(p.title)} complete" aria-pressed="false"><span class="box"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5 6.5 12 13 4.5" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button><div class="ptitle"><span class="idx">${String(p.i).padStart(2,'0')} · #${p.num}</span><a class="name" href="${p.url}" target="_blank" rel="noopener">${esc(p.title)}</a><span class="pill ${p.diff}">${p.diff}</span><span class="src you retrybadge" hidden>RETRIED</span></div><div class="rside"><button class="iconbtn notebtn" aria-label="Notes for ${esc(p.title)}" aria-expanded="false" aria-controls="note-${p.num}" title="Write heap invariant and complexity">&#9998;</button><a class="iconbtn" href="${p.url}" target="_blank" rel="noopener" aria-label="Open ${esc(p.title)} on LeetCode">↗</a></div><div class="note" id="note-${p.num}" style="grid-column:1/-1"><textarea aria-label="Notes for ${esc(p.title)}" placeholder="Heap stores… Root means… Safe because… Time / space… Edge cases… Alternative…"></textarea><label class="revisit"><input type="checkbox" class="retry">I retried this from a blank editor after a delay, without hints.</label></div></div>`).join('')}</div></section>`).join('');
+const bySlug=new Map(DATA.problems.map(p=>[p.slug,p]));
+const rows=[...document.querySelectorAll('.row')];
+rows.forEach(r=>{r.querySelector('textarea').value=state.notes[r.dataset.slug]||'';r.querySelector('.retry').checked=!!state.review[r.dataset.slug];});
+function paint(){let total=0;DATA.levels.forEach(l=>{const ps=DATA.problems.filter(p=>p.level===l.id),n=ps.filter(p=>state.done[p.slug]).length;total+=n;const c=$('#c'+l.id);c.querySelector('span').textContent=`${n}/${ps.length}`;c.querySelector('i').style.width=100*n/ps.length+'%';c.classList.toggle('done',n===ps.length);});$('#bigN').textContent=total;$('#bigBar').style.width=100*total/DATA.problems.length+'%';$('.bar').setAttribute('aria-valuenow',total);$('#reviewCount').textContent=`12 stages · ${DATA.problems.filter(p=>state.review[p.slug]).length} blank-editor retries`;
+$('#drillCount').textContent=`(${drills.filter((_,i)=>state.drills[i]).length}/${drills.length})`;
+rows.forEach(r=>{const d=!!state.done[r.dataset.slug];r.classList.toggle('done',d);r.classList.toggle('you',d);r.querySelector('.check').setAttribute('aria-pressed',d);r.querySelector('.retrybadge').hidden=!state.review[r.dataset.slug];});applyFilter();}
+function applyFilter(){const q=$('#q').value.toLowerCase().trim().replace(/^#/,''),lvl=$('#pattern').value,diff=$('#difficulty').value;let n=0;rows.forEach(r=>{const p=bySlug.get(r.dataset.slug),d=!!state.done[p.slug],show=(filter==='all'||(filter==='done'?d:!d))&&(lvl==='all'||p.level===+lvl)&&(diff==='all'||p.diff===diff)&&(!q||(`${p.num} ${p.title}`).toLowerCase().includes(q));r.hidden=!show;r.style.display=show?'':'none';if(show)n++;});document.querySelectorAll('.level').forEach(l=>l.hidden=![...l.querySelectorAll('.row')].some(r=>!r.hidden));$('#empty').style.display=n?'none':'block';$('#resultCount').textContent=`${n} of ${DATA.problems.length} problems shown`;}
+$('#levels').addEventListener('click',e=>{const r=e.target.closest('.row');if(!r)return;const s=r.dataset.slug;if(e.target.closest('.check')){state.done[s]=!state.done[s];save();paint();}else if(e.target.closest('.notebtn')){const b=r.querySelector('.notebtn'),n=r.querySelector('.note');n.classList.toggle('open');b.setAttribute('aria-expanded',n.classList.contains('open'));if(n.classList.contains('open'))n.querySelector('textarea').focus();}});
+$('#levels').addEventListener('input',e=>{const r=e.target.closest('.row');if(e.target.matches('textarea')){state.notes[r.dataset.slug]=e.target.value;save();}});
+document.addEventListener('change',e=>{if(e.target.matches('[data-group]')){state[e.target.dataset.group][e.target.dataset.id]=e.target.checked;save();paint();}if(e.target.matches('.retry')){state.review[e.target.closest('.row').dataset.slug]=e.target.checked;save();paint();}});
+document.querySelectorAll('[data-f]').forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.f;document.querySelectorAll('[data-f]').forEach(c=>{c.classList.toggle('on',c===b);c.setAttribute('aria-pressed',c===b);});applyFilter();}));
+['#q','#pattern','#difficulty'].forEach(id=>$(id).addEventListener(id==='#q'?'input':'change',applyFilter));
+$('#next').addEventListener('click',()=>{const p=DATA.problems.find(p=>!state.done[p.slug]);if(!p){$('#resultCount').textContent='All problems completed. Revisit the mastery checks and blank-editor retries.';return;}$('#q').value='';$('#difficulty').value='all';$('#pattern').value=String(p.level);document.querySelector('[data-f="todo"]').click();const r=rows.find(r=>r.dataset.slug===p.slug);r.scrollIntoView({behavior:'smooth',block:'center'});r.querySelector('.check').focus({preventScroll:true});});
+$('#backup').addEventListener('click',()=>{const b=new Blob([JSON.stringify({track:'heap-ladder',version:1,state},null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='heap-ladder-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);$('#backupStatus').textContent='Backup downloaded. Keep it somewhere safe; it contains your notes.';});
+$('#restore').addEventListener('click',()=>$('#restoreFile').click());$('#restoreFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{if(f.size>2000000)throw Error();const d=JSON.parse(await f.text());if(d.track!=='heap-ladder'||d.version!==1||!valid(d.state))throw Error();if(!confirm('Replace Heap progress and notes on this device with this backup? Greedy will not change.'))return;state=d.state;save();checks('#drills',drills,'drills');checks('#mastery',mastery,'mastery');rows.forEach(r=>{r.querySelector('textarea').value=state.notes[r.dataset.slug]||'';r.querySelector('.retry').checked=!!state.review[r.dataset.slug];});paint();$('#backupStatus').textContent='Heap backup restored.';}catch(err){$('#backupStatus').textContent='That is not a valid Heap Ladder backup. Nothing was replaced.';}finally{e.target.value='';}});
+paint();
+</script></body></html>

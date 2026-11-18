@@ -1,0 +1,6 @@
+{
+  "name": "greedy-heap-ladder",
+  "private": true,
+  "scripts": {"test": "node tests/tracker.cjs", "build": "python3 build.py && python3 build_heap.py"},
+  "devDependencies": {"playwright": "^1.56.1"}
+}
