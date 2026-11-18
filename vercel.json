@@ -1,5 +1,8 @@
 {
   "version": 2,
   "name": "greedy-ladder",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "installCommand": "",
+  "buildCommand": "echo 'static site: pages are committed'",
+  "outputDirectory": "."
 }
